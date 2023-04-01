@@ -54,3 +54,5 @@ app.get('/ruta-prueba', (req, res) => {
 app.listen(puerto, () => {
     console.log("Servidor de node corriendo en el puerto: " + puerto)
 })
+
+module.exports = app

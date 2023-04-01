@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Api rest con Node, Mongo, Express y JWT para una red social.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+  "scripts": {    
+    "start": "nodemon src/index.js",
+    "test": "mocha"
   },
   "author": "Luis Gomez",
   "license": "MIT",
@@ -21,6 +21,9 @@
     "validator": "^13.9.0"
   },
   "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.21"
   }
 }
