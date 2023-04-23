@@ -11,6 +11,7 @@ const path = require('path')
 const followService = require('../services/followService')
 const follow = require('../models/follow')
 const publication = require('../models/publication')
+const validate = require('../helpers/validates')
 
 // Acciones de prueba
 
@@ -36,6 +37,17 @@ const register = async (req, res) => {
             status: 'Error'
         })
     }
+    // Validacion avanzada
+
+    try {
+        validate.validate(params)        
+    } catch (error) {
+        return res.status(400).json({
+            status: 'Error',
+            message: 'Validacion no superada'            
+        })        
+    }
+    
     // crear objeto usuario
 
     // control usuarios duplicados
@@ -46,7 +58,7 @@ const register = async (req, res) => {
         ]
     }).exec().then(async (users) => {
         if (users && users.length >= 1) {
-            return res.status(500).send({ status: 'success', message: 'El Usuario ya existe' })
+            return res.status(500).send({ status: 'error', message: 'El Usuario ya existe' })
         } else {
             // cifrar contraseña
             let pwd = await bcrypt.hash(params.password, 10)
@@ -291,27 +303,29 @@ const upload = async (req, res) => {
 }
 
 
-const avatar = (req, res) => {
+const avatar = async(req, res) => {
     // sacar el parametro de la URL
     const file = req.params.file
     // montar el path real
 
-    const filePath = './uploads/avatars/' + file
-    console.log(filePath)
+    const filePath = './src/uploads/avatars/' + file
+    //console.log(filePath)
 
-    // comprobar que existe el archivo
+    // comprobar que existe el archivo	
+	try{
+		console.log("Estoy en el try")
+		//let avatar = await fs.statSync(filePath)
 
-    fs.stat(filePath, (error, exists) => {
-        if (exists){
-            // devolver un file
-            return res.sendFile(path.resolve(filePath))            
-        }else {
-            return res.status(404).send({ 
+		return res.sendFile(path.resolve(filePath))
+		
+	}catch{
+		return res.status(404).send({ 
                 status: 'Error',
-                 message: 'Archivo no existe' 
-            })
-        } 
-    })
+                message: 'Archivo no existe',
+				filePath
+				 
+            })	
+	}   
 }
 
 const counters = async (req, res) =>{
@@ -327,8 +341,8 @@ const counters = async (req, res) =>{
         const publications = await publication.count({'user': userId})
 
         return res.status(200).send({ 
-            status: 'Error',
-             message: 'Archivo no existe',
+             status: 'success',
+             userId,
              following,
              followed,
              publications

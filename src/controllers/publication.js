@@ -15,12 +15,13 @@ const pruebaPublication = (req, res) => {
 // GUardar publicacion
 const save = async (req, res) => {
     // recoger datos del body
-    const params = req.body
+    const params = req.body.newPublication
+	
 
     // si no llegan dar respuesta negativa
     if (!params.text) return res.status(400).send({ status: "Error", "message": "Debes enviar el texto de la publicación" })
 
-    console.log(params.text);
+    
 
     // crear y rellenar el objeto del modelo
     let newPublication = new Publication({
@@ -81,11 +82,11 @@ const detail = async (req, res) => {
 const remove = async (req, res) => {
 
     // sacat id de publicacion a eliminar
-    const publicaciionId = req.params.id
+    const publicacionId = req.params.id
 
     // find de pub y remove
     try {
-        let publicationRemove = await Publication.find({ 'user': req.user.id, '_id': publicaciionId }).deleteOne()
+        let publicationRemove = await Publication.find({ 'user': req.user.id, '_id': publicacionId }).deleteOne()
         // devolver respuesta
         return res.status(200).send({
             status: 'success',
@@ -157,8 +158,9 @@ const user = async (req, res) => {
 // subir ficheros
 const upload = async (req, res) => {
     // sacar publication id
-    const publicaciionId = req.params.id
+    const publicationId = req.params.id
     // recoger fichero y comprobar que existe
+	console.log(req.file)
     if (!req.file) {
         return res.status(404).send({
             status: "Error",
@@ -184,7 +186,7 @@ const upload = async (req, res) => {
     }
     // si es correcto guardar imagen en bd
     try {
-        let publicationUpdated = await Publication.findOneAndUpdate({'user': req.user.id, '_id': publicaciionId}, { file: req.file.filename }, { new: true })
+        let publicationUpdated = await Publication.findOneAndUpdate({'user': req.user.id, '_id': publicationId}, { file: req.file.filename }, { new: true })
 
         // devolver respuesta
         return res.status(200).send({
@@ -211,22 +213,20 @@ const media = (req, res) => {
     const file = req.params.file
     // montar el path real
 
-    const filePath = './uploads/publications/' + file
-    console.log(filePath)
+    const filePath = './src/uploads/publications/' + file
 
     // comprobar que existe el archivo
-
-    fs.stat(filePath, (error, exists) => {
-        if (exists){
-            // devolver un file
-            return res.sendFile(path.resolve(filePath))            
-        }else {
-            return res.status(404).send({ 
+	
+	try{
+		return res.sendFile(path.resolve(filePath))
+		
+	}
+	catch{
+		return res.status(404).send({ 
                 status: 'Error',
                  message: 'Archivo no existe' 
-            })
-        } 
-    })
+         })
+	}    
 }
 
 // listar todas las publicaciones(FEED)

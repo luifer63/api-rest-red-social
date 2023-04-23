@@ -126,10 +126,9 @@ const following = async (req, res) =>{
             page,
             pages: Math.ceil(total / itemsPerPage),
             itemsPerPage,
-            users_Following: followUserIds.following,
-            users_Follow_me: followUserIds.followers     
-
-        })
+            users_Following: usersFollowing,
+            users_Follow_me: followUserIds.followers,
+		})
         
     } catch (error) {
         return res.status(404).send({
@@ -167,7 +166,7 @@ const followers = async (req, res) =>{
     let total = follows.length
 
     try {
-        let usersFollowing = await Follow.find({followed: userId})
+        let usersFollowMe = await Follow.find({followed: userId})
                                     .populate("user", "-password -role -__v -email")
                                     .paginate(page, itemsPerPage)
                                     .exec()
@@ -185,10 +184,8 @@ const followers = async (req, res) =>{
             page,
             pages: Math.ceil(total / itemsPerPage),            
             itemsPerPage,
-            follows: usersFollowing,
             users_Following: followUserIds.following,
-            users_Follow_me: followUserIds.followers     
-
+            users_Follow_me: usersFollowMe,
         })
         
     } catch (error) {
